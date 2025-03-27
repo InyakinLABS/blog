@@ -1,0 +1,40 @@
+.container {
+    display: flex;
+    flex-direction: column;
+    min-height: 100vh;
+    padding: 26px 0;
+  }
+  
+.post-list {
+    display: flex;
+    flex-direction: column;
+    row-gap: 20px;
+    width: 940px;
+    margin: 0 auto;
+  }
+  .custom-pagination {
+    margin-top: auto;
+    padding: 20px 0;
+    display: flex;
+    justify-content: center;
+    /* Неактивные */
+    
+    .ant-pagination-item:not(.ant-pagination-item-active) {
+      background: transparent;
+      border: none;
+      
+      a {
+        color: #000;
+      }
+    }
+  
+    /* Активная */
+    .ant-pagination-item-active {
+      background: #1890ff;
+      border-color: #1890ff;
+      
+      a {
+        color: white;
+      }
+    }
+  }

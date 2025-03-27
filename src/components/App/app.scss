@@ -1,0 +1,18 @@
+body{
+   background-color: #EBEEF3;
+    height: 100vh;
+    font-family: "Inter";
+    -ms-overflow-style: none;
+}
+/* Для вебкит-браузеров (Chrome, Safari, Edge) */
+::-webkit-scrollbar {
+    width: 0 !important;
+    height: 0 !important;
+    display: none;
+  }
+  
+  /* Для Firefox */
+  html {
+    scrollbar-width: none;
+  }
+  
