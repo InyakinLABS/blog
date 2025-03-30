@@ -5,6 +5,8 @@ import styles from './post.module.scss';
 import { format, parseISO } from 'date-fns';
 import { useFavoriteArticleMutation, useUnfavoriteArticleMutation } from '../../services/api';
 import { ru } from 'date-fns/locale';
+import {Link} from 'react-router-dom'
+import { store } from "../../services/store";
 
 const Post = ({ article }) => {
   const {
@@ -19,6 +21,7 @@ const Post = ({ article }) => {
     favorited,
     
   } = article;
+  const {isLoggedIn}=store.getState().auth
 
   const userImage = author.image;
   const [favoriteArticle, { isLoading: isFavoriting }] = useFavoriteArticleMutation();
@@ -33,9 +36,9 @@ const Post = ({ article }) => {
       } else {
         await favoriteArticle(slug).unwrap();
       }
+   
     } catch (error) {
       console.error('Error:', error);
-      // Можно добавить уведомление об ошибке
     }
   };
 
@@ -43,11 +46,13 @@ const Post = ({ article }) => {
     <div className={styles.post}>
       <div className={styles.postHeader}>
         <div className={styles.headerInfo}>
+          <Link to={`/articles/${slug}`}>
           <span className={styles.postTitle}>{title}</span>
+          </Link>
           <button 
             className={styles.postLikes}
             onClick={handleLike}
-            disabled={isFavoriting || isUnfavoriting}
+            disabled={isFavoriting || isUnfavoriting || !isLoggedIn}
           >
             {favorited ? (
               <HeartFilled className={styles.likeIconActive} />
@@ -56,12 +61,9 @@ const Post = ({ article }) => {
             )}
             <span>{favoritesCount}</span>
           </button>
-          <div className={styles.postTags}>
-            {tagList.map(tag => (
-              <span key={tag} className={styles.tag}>{tag}</span>
-            ))}
-          </div>
+          
         </div>
+        
         <div className={styles.postAuthor}>
           <div className={styles.authorInfo}>
             <span className={styles.authorName}>{author.username}</span>
@@ -73,9 +75,15 @@ const Post = ({ article }) => {
             alt="author" 
           />
         </div>
+        
       </div>
+      <div className={styles.postTags}>
+            {tagList.map((tag,index) => (
+              <span key={index} className={styles.tag}>{tag}</span>
+            ))}
+          </div>
       <div className={styles.postBody}>
-        {description || body}
+        { body}
       </div>
     </div>
   );

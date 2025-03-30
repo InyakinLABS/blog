@@ -179,7 +179,7 @@ const SignUp = () => {
           </button>
           <span className={styles.formSigninText}>
             Already have an account?{' '}
-            <Link className={styles.formLink} to="/signIn">
+            <Link className={styles.formLink} to="/sign-in">
               Sign In
             </Link>
           </span>

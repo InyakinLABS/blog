@@ -4,18 +4,17 @@ export const api = createApi({
   reducerPath: 'blogApi',
   baseQuery: fetchBaseQuery({ 
     baseUrl: 'https://blog-platform.kata.academy/api',
-    prepareHeaders: (headers, { getState }) => {
-        // Получаем токен из хранилища Redux
-        const { isLoggedIn, token } = getState().auth;
-        
-        // Если токен есть, добавляем его в заголовки
-        if (isLoggedIn && token) {
+    prepareHeaders: (headers) => {
+     
+        const token=localStorage.getItem('token')
+        if (token) {
             headers.set('Authorization', `Token ${token}`);
           }
           return headers;
-        }
+        },
+        timeout:10000,
   }),
-  tagTypes: ['Article'], // Убедитесь что это есть
+  tagTypes: ['Article'],
   endpoints: (builder) => ({
     getArticles: builder.query({
       query: ({ limit = 5, offset = 0 }) => ({
@@ -32,12 +31,11 @@ export const api = createApi({
       transformResponse: (response) => ({
         articles: response.articles,
         articlesCount: response.articlesCount
-      })
+      }),
     }),
     getArticle: builder.query({
       query: (slug) => ({
         url: `/articles/${slug}`,
-        // Параметр slug уже в URL, поэтому params не нужен
       }),
       transformResponse: (response) => response.article
     }),
@@ -57,12 +55,15 @@ export const api = createApi({
           body: { user: userData }
         }),
         transformResponse: (response) => {
+        
           localStorage.setItem('token', response.user.token);
+          localStorage.setItem('user',JSON.stringify(response.user))
           return response.user;
         },
         transformErrorResponse: (response) => {
           return response.data.errors || 'Login failed';
-        }
+        },
+        invalidatesTags: ['Article'],
       }),
       favoriteArticle: builder.mutation({
         query: (slug) => ({
@@ -79,11 +80,51 @@ export const api = createApi({
         }),
         transformResponse: (response) => response.article,
         invalidatesTags: (result, error, slug) => [{ type: 'Article', id: slug }],
-    }),
+      }),
+
+      editUser: builder.mutation({
+        query:(userData)=>({
+            url:`/user`,
+            method:'PUT',
+            body:userData,
+        }),
+        transformResponse:(response)=>{
+            localStorage.setItem('user',JSON.stringify(response.user))
+            localStorage.setItem('token',response.user.token)
+            return response.user}
+      }),
+
+      createPost:builder.mutation({
+        query:(postData)=>({
+          url:`/articles`,
+          method:'POST',
+          body:{
+            article:postData
+          },
+        }),
+        invalidatesTags: ['Article'],
+      }),
+
+      editPost: builder.mutation({
+        query: ({ slug, ...postData }) => ({  // Изменено на объект параметров
+          url: `/articles/${slug}`,
+          method: 'PUT',
+          body: { article: postData }  // Убедитесь, что структура соответствует API
+        }),
+        invalidatesTags: ['Article'],
+      }),
+
+      deletePost:builder.mutation({
+        query:(slug)=>({
+          url:`/articles/${slug}`,
+          method:"DELETE"
+        }),
+        invalidatesTags: ['Article'],
+      })
+
   })
 });
 
-// Экспортируем все автоматически сгенерированные хуки
 export const { 
   useGetArticlesQuery,
   useGetArticleQuery,
@@ -91,5 +132,8 @@ export const {
   useLoginUserMutation,
   useFavoriteArticleMutation,
   useUnfavoriteArticleMutation,
-  // Другие хуки будут здесь по мере добавления endpoints
+  useEditUserMutation,
+  useCreatePostMutation,
+  useDeletePostMutation,
+  useEditPostMutation,
 } = api;

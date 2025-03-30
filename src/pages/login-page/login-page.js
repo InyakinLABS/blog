@@ -1,12 +1,13 @@
 import React, { useState } from "react";
-import { Link, useHistory } from "react-router-dom";
+import { Link } from "react-router-dom";
 import { useForm } from "react-hook-form";
 import { useDispatch } from "react-redux";
 import { useLoginUserMutation } from "../../services/api";
 import styles from "./login-page.module.scss";
 import { loginStart, loginSuccess, loginFailure } from '../../services/authSlice'
 
-const Login = ({ onLogin }) => {
+
+const Login = () => {
   const [serverError, setServerError] = useState(null);
   const { 
     register, 
@@ -14,7 +15,7 @@ const Login = ({ onLogin }) => {
     formState: { errors, isValid } 
   } = useForm({ mode: 'onChange' });
   const dispatch = useDispatch();
-  const [loginUser] = useLoginUserMutation();
+  const [loginUser,{isLoading}] = useLoginUserMutation();
 
   const onSubmit = async (data) => {
     try {
@@ -23,9 +24,9 @@ const Login = ({ onLogin }) => {
         email: data.email,
         password: data.password
       }).unwrap();
-      
+      console.log(userData);
       dispatch(loginSuccess(userData));
-      localStorage.setItem('token', userData.token);
+      
     } catch (error) {
       dispatch(loginFailure(error.data?.message || 'Login failed'));
     }
@@ -88,13 +89,13 @@ const Login = ({ onLogin }) => {
           <button 
             type="submit" 
             className={styles.submitBtn}
-            disabled={!isValid }
+            disabled={!isValid||isLoading }
           >
-            {isValid? 'Logging in...' : 'Login'}
+            {isValid&&isLoading? 'Logging in...' : 'Login'}
           </button>
           <span className={styles.formSigninText}>
             Don't have an account?{" "}
-            <Link className={styles.formLink} to="/signUp">
+            <Link className={styles.formLink} to="/sign-up">
               Sign Up
             </Link>
           </span>

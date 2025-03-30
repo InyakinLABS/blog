@@ -17,7 +17,10 @@ font-size: 18px;
 line-height: 28px;
 letter-spacing: 0%;
 vertical-align: middle;
-
+&:hover{
+    transform: scale(1.1);
+   transition: all 0.5s;
+}
 }
 .buttons{
     display: flex;
@@ -120,7 +123,10 @@ cursor: pointer;
     
     // Добавляем стили для изображения (если есть)
     &-image {
+        height: 46px;
+        width: 46px;
       flex-shrink: 0; // Запрещаем сжатие изображения
-      object-fit: cover; // Для правильного отображения
+      object-fit: cover;
+      border-radius: 50%; // Для правильного отображения
     }
   }

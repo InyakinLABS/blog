@@ -1,114 +1,158 @@
 .post {
-    height: 140px;
-    width: 940px;
-    border-radius: 5px;
-    background-color: white;
-    padding: 10px;
-    box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.15);
+  height: 150px;
+  width: 940px;
+  border-radius: 5px;
+  background-color: white;
+  padding: 10px;
+  box-shadow: 0px 4px 12px 0px rgba(0, 0, 0, 0.15);
   animation: fadeIn ease 0.5s;
-    &Header {
-      display: flex;
-      justify-content: space-between;
-      margin-bottom: 10px;
-    }
-  
-    &Author {
-      display: flex;
-      align-items: center;
-    }
-  
-    &Title {
-      font-size: 20px;
-      line-height: 28px;
-      color: #1890FF;
-      display: inline-block;
-      vertical-align: middle;
-    }
-  
-    &Likes {
-      margin-left: 10px;
-      vertical-align: middle;
-      background: none;
-      border: none;
-      cursor: pointer;
-      display: inline-flex;
-      align-items: center;
-      gap: 4px;
-      padding: 0;
-    }
-  
-    &Tags {
-      display: flex;
-      gap: 5px;
-      margin: 5px 0;
-    }
-  
-    &Body {
-      width: 682px;
-      height: 48px;
+  overflow: hidden; // Главное ограничение
 
-      font-size: 12px;
-      line-height: 22px;
-      color: rgba(0, 0, 0, 0.75);
-      height: 44px; // 2 строки (22px * 2)
-      overflow: hidden;
-      line-clamp: 2;
-      display: -webkit-box;
-      -webkit-line-clamp: 2;
-      -webkit-box-orient: vertical;
-    }
+  &Header {
+    display: flex;
+    justify-content: space-between;
+    height: 40px;
   }
-  
-  .author {
-    &Info {
-      display: flex;
-      flex-direction: column;
-      margin-right: 10px;
-      align-items: flex-end;
-    }
-  
-    &Name {
-      font-size: 18px;
-      line-height: 28px;
-      white-space: nowrap;
-    }
-  
-    &Pic {
-      width: 46px;
-      height: 46px;
-      border-radius: 50%;
-    }
-  }
-  
-  .tag {
-    height: 20px;
-    border: 1px solid rgba(0, 0, 0, 0.5);
-    border-radius: 2px;
-    padding: 2px;
-    font-size: 12px;
-    display: inline-flex;
+
+  &Author {
+    display: flex;
     align-items: center;
+    align-self: flex-start;
+    flex-shrink: 0; // Запрещаем сжатие
   }
-  
-  .postDate {
-    font-size: 12px;
-    line-height: 22px;
-    color: rgba(0, 0, 0, 0.5);
+
+  &Title {
+    font-size: 20px;
+    line-height: 28px;
+    color: #1890FF;
+    display: -webkit-box;
+    -webkit-line-clamp: 1;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 682px;
     white-space: nowrap;
   }
-  
-  .likeIcon {
-    font-size: 16px;
-    transition: color 0.3s ease;
-  
-    &Active {
-      color: #ff69b4;
-      font-size: 16px;
-      transition: color 0.3s ease;
+
+  &Likes {
+    margin-left: 10px;
+    background: none;
+    border: none;
+    cursor: pointer;
+    display: inline-flex;
+    align-items: center;
+    vertical-align: middle;
+    gap: 4px;
+    padding: 0;
+    flex-shrink: 0; // Фиксируем размер
+  }
+
+  &Tags {
+    display: flex;
+    gap: 5px;
+    max-width: 100%;
+    overflow-x: auto; // Горизонтальный скролл при переполнении
+    padding-bottom: 2px; // Для скролла
+    
+    &::-webkit-scrollbar {
+      height: 3px;
+    }
+    
+    &::-webkit-scrollbar-thumb {
+      background: rgba(0,0,0,0.1);
+      border-radius: 3px;
     }
   }
-  @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(-20px); }
-    to { opacity: 1; transform: translateY(0); }
+
+  &Body {
+    font-size: 12px;
+    line-height: 22px;
+    color: rgba(0, 0, 0, 0.75);
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    height: 44px;
+    margin-top: 10px;
   }
-  
+}
+
+.author {
+  &Info {
+    display: flex;
+    flex-direction: column;
+    margin-right: 10px;
+    align-items: flex-end;
+    min-width: 0; // Позволяет тексту сжиматься
+  }
+
+  &Name {
+    font-size: 18px;
+    line-height: 28px;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    max-width: 150px; // Ограничение имени автора
+  }
+
+  &Pic {
+    width: 46px;
+    height: 46px;
+    border-radius: 50%;
+    flex-shrink: 0;
+  }
+}
+
+.tag {
+  height: 20px;
+  border: 1px solid rgba(0, 0, 0, 0.5);
+  border-radius: 2px;
+  padding: 2px 5px;
+  font-size: 12px;
+  display: inline-flex;
+  align-items: center;
+  max-width: 150px;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  flex-shrink: 0;
+}
+
+.postDate {
+  font-size: 12px;
+  line-height: 22px;
+  color: rgba(0, 0, 0, 0.5);
+  white-space: nowrap;
+}
+
+.likeIcon {
+  font-size: 16px;
+  transition: color 0.3s ease;
+
+  &Active {
+    color: #ff69b4;
+    font-size: 16px;
+    transition: color 0.3s ease;
+  }
+}
+
+@keyframes fadeIn {
+  from { opacity: 0; transform: translateY(-20px); }
+  to { opacity: 1; transform: translateY(0); }
+}
+.headerInfo{
+  display: flex;
+  flex-direction: row;
+  height: 28px;
+  align-items: center; // Изменено с 'start' на 'center'
+  gap: 10px; // Добавлен отступ между элементами
+  flex-wrap: wrap; // Для адаптивности
+}
+.postTags {
+  display: flex;
+  gap: 5px;
+  flex-wrap: wrap;
+  overflow: hidden;
+ max-width: 700px;
+}
