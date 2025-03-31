@@ -8,20 +8,34 @@ import { useRegisterUserMutation } from '../../services/api'
 import styles from './signUp.module.scss'
 
 const SignUp = () => {
-  const [showResult, setShowResult] = useState(null) // null | 'success' | 'error'
+  const [showResult, setShowResult] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
+  const [serverErrors, setServerErrors] = useState({})
 
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid, isSubmitting },
+    formState: { errors, isSubmitting, isValid },
     reset,
     watch,
+    setError,
+    clearErrors,
+    trigger,
   } = useForm({
-    mode: 'onChange',
+    mode: 'onTouched',
+    defaultValues: {
+      username: '',
+      email: '',
+      password: '',
+      repeatPassword: '',
+      agree: false,
+    },
   })
 
   const [registerUser, { isLoading }] = useRegisterUserMutation()
+
+  // Точное регулярное выражение для email
+  const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
   const onSubmit = async (formData) => {
     try {
@@ -33,14 +47,36 @@ const SignUp = () => {
 
       setShowResult('success')
       reset()
+      setServerErrors({})
     } catch (error) {
-      setErrorMessage(error.data?.message || 'Registration failed')
-      setShowResult('error')
+      if (error.data?.errors) {
+        const { errors: serverErrors } = error.data
+        setServerErrors(serverErrors)
+
+        Object.keys(serverErrors).forEach((field) => {
+          setError(field, {
+            type: 'server',
+            message: `${field.charAt(0).toUpperCase() + field.slice(1)} ${serverErrors[field]}`,
+          })
+        })
+      } else {
+        setErrorMessage(error.message || 'Registration failed')
+        setShowResult('error')
+      }
     }
   }
 
-  // Регулярное выражение для email с обязательной точкой
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
+  const handleInputChange = async (fieldName) => {
+    if (serverErrors[fieldName]) {
+      setServerErrors((prev) => {
+        const newErrors = { ...prev }
+        delete newErrors[fieldName]
+        return newErrors
+      })
+      clearErrors(fieldName)
+    }
+    await trigger(fieldName)
+  }
 
   if (showResult === 'success') {
     return (
@@ -85,36 +121,50 @@ const SignUp = () => {
           <label htmlFor="username">Username</label>
           <input
             id="username"
-            placeholder="Username"
-            className={`${styles.formInput} ${errors.username && styles.errorInput}`}
+            placeholder="Username (3-20 characters)"
+            className={`${styles.formInput} ${(errors.username || serverErrors.username) && styles.errorInput}`}
             {...register('username', {
               required: 'Username is required',
               minLength: {
                 value: 3,
                 message: 'Username must be at least 3 characters',
               },
+              maxLength: {
+                value: 20,
+                message: 'Username must be no more than 20 characters',
+              },
+              pattern: {
+                value: /^[a-zA-Z0-9]+$/,
+                message: 'Username can only contain letters and numbers',
+              },
             })}
+            onChange={() => handleInputChange('username')}
           />
-          {errors.username && <span className={styles.errorText}>{errors.username.message}</span>}
+          {(errors.username || serverErrors.username) && (
+            <span className={styles.errorText}>{errors.username?.message || `Username ${serverErrors.username}`}</span>
+          )}
         </div>
 
-        {/* Email с валидацией точки */}
+        {/* Email */}
         <div className={styles.formGroup}>
           <label htmlFor="email">Email address</label>
           <input
             id="email"
             type="email"
             placeholder="Email"
-            className={`${styles.formInput} ${errors.email && styles.errorInput}`}
+            className={`${styles.formInput} ${(errors.email || serverErrors.email) && styles.errorInput}`}
             {...register('email', {
               required: 'Email is required',
               pattern: {
                 value: emailRegex,
-                message: 'Please enter a valid email (example@domain.com)',
+                message: 'Please enter a valid email address',
               },
             })}
+            onChange={() => handleInputChange('email')}
           />
-          {errors.email && <span className={styles.errorText}>{errors.email.message}</span>}
+          {(errors.email || serverErrors.email) && (
+            <span className={styles.errorText}>{errors.email?.message || `Email ${serverErrors.email}`}</span>
+          )}
         </div>
 
         {/* Password */}
@@ -123,17 +173,24 @@ const SignUp = () => {
           <input
             id="password"
             type="password"
-            placeholder="Password"
-            className={`${styles.formInput} ${errors.password && styles.errorInput}`}
+            placeholder="Password (6-40 characters)"
+            className={`${styles.formInput} ${(errors.password || serverErrors.password) && styles.errorInput}`}
             {...register('password', {
               required: 'Password is required',
               minLength: {
                 value: 6,
                 message: 'Password must be at least 6 characters',
               },
+              maxLength: {
+                value: 40,
+                message: 'Password must be no more than 40 characters',
+              },
             })}
+            onChange={() => handleInputChange('password')}
           />
-          {errors.password && <span className={styles.errorText}>{errors.password.message}</span>}
+          {(errors.password || serverErrors.password) && (
+            <span className={styles.errorText}>{errors.password?.message || `Password ${serverErrors.password}`}</span>
+          )}
         </div>
 
         {/* Repeat Password */}
@@ -148,6 +205,7 @@ const SignUp = () => {
               required: 'Please repeat your password',
               validate: (value) => value === watch('password') || 'Passwords do not match',
             })}
+            onChange={() => handleInputChange('repeatPassword')}
           />
           {errors.repeatPassword && <span className={styles.errorText}>{errors.repeatPassword.message}</span>}
         </div>
@@ -170,7 +228,7 @@ const SignUp = () => {
 
         {/* Submit Button */}
         <div className={styles.formSubmit}>
-          <button type="submit" className={styles.submitBtn} disabled={!isValid || isSubmitting || isLoading}>
+          <button type="submit" className={styles.submitBtn} disabled={isSubmitting || isLoading || !isValid}>
             {isSubmitting || isLoading ? 'Processing...' : 'Create'}
           </button>
           <span className={styles.formSigninText}>
