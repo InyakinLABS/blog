@@ -1,4 +1,4 @@
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useForm } from 'react-hook-form'
 import { Link } from 'react-router-dom'
 import { Result, Button } from 'antd'
@@ -11,6 +11,7 @@ const SignUp = () => {
   const [showResult, setShowResult] = useState(null)
   const [errorMessage, setErrorMessage] = useState('')
   const [serverErrors, setServerErrors] = useState({})
+  const [autoFilled, setAutoFilled] = useState(false)
 
   const {
     register,
@@ -21,8 +22,9 @@ const SignUp = () => {
     setError,
     clearErrors,
     trigger,
+    setValue,
   } = useForm({
-    mode: 'onChange',
+    mode: 'onTouched',
     defaultValues: {
       username: '',
       email: '',
@@ -34,7 +36,22 @@ const SignUp = () => {
 
   const [registerUser, { isLoading }] = useRegisterUserMutation()
 
-  // Точное регулярное выражение для email
+  // Проверка автозаполнения после монтирования компонента
+  useEffect(() => {
+    const checkAutoFill = setInterval(() => {
+      const inputs = document.querySelectorAll('input')
+      const isAutoFilled = Array.from(inputs).some((input) => input.matches(':-webkit-autofill'))
+
+      if (isAutoFilled && !autoFilled) {
+        setAutoFilled(true)
+        // Триггерим валидацию для всех полей
+        trigger()
+      }
+    }, 200)
+
+    return () => clearInterval(checkAutoFill)
+  }, [trigger, autoFilled])
+
   const emailRegex = /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/
 
   const onSubmit = async (formData) => {
@@ -138,7 +155,12 @@ const SignUp = () => {
                 message: 'Username can only contain letters and numbers',
               },
             })}
-            onChange={() => handleInputChange('username')}
+            onChange={(e) => {
+              handleInputChange('username', e)
+              setValue('username', e.target.value, { shouldValidate: true })
+            }}
+            onBlur={() => trigger('username')}
+            autoComplete="username"
           />
           {(errors.username || serverErrors.username) && (
             <span className={styles.errorText}>{errors.username?.message || `Username ${serverErrors.username}`}</span>
@@ -160,7 +182,12 @@ const SignUp = () => {
                 message: 'Please enter a valid email address',
               },
             })}
-            onChange={() => handleInputChange('email')}
+            onChange={(e) => {
+              handleInputChange('email', e)
+              setValue('email', e.target.value, { shouldValidate: true })
+            }}
+            onBlur={() => trigger('email')}
+            autoComplete="email"
           />
           {(errors.email || serverErrors.email) && (
             <span className={styles.errorText}>{errors.email?.message || `Email ${serverErrors.email}`}</span>
@@ -186,7 +213,12 @@ const SignUp = () => {
                 message: 'Password must be no more than 40 characters',
               },
             })}
-            onChange={() => handleInputChange('password')}
+            onChange={(e) => {
+              handleInputChange('password', e)
+              setValue('password', e.target.value, { shouldValidate: true })
+            }}
+            onBlur={() => trigger('password')}
+            autoComplete="new-password"
           />
           {(errors.password || serverErrors.password) && (
             <span className={styles.errorText}>{errors.password?.message || `Password ${serverErrors.password}`}</span>
@@ -205,7 +237,11 @@ const SignUp = () => {
               required: 'Please repeat your password',
               validate: (value) => value === watch('password') || 'Passwords do not match',
             })}
-            onChange={() => handleInputChange('repeatPassword')}
+            onChange={(e) => {
+              setValue('repeatPassword', e.target.value, { shouldValidate: true })
+            }}
+            onBlur={() => trigger('repeatPassword')}
+            autoComplete="new-password"
           />
           {errors.repeatPassword && <span className={styles.errorText}>{errors.repeatPassword.message}</span>}
         </div>
