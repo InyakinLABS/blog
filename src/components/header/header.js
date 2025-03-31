@@ -1,54 +1,57 @@
-import React from "react";
-import './header.scss';
-import { useSelector, useDispatch } from 'react-redux';
-import { Link } from "react-router-dom";
-import { logout } from "../../services/authSlice";
-import fallbackimage from './Rectangle.svg';
-import { useHistory } from "react-router-dom";
+import React from 'react'
+import { useSelector, useDispatch } from 'react-redux'
+import { Link, useHistory } from 'react-router-dom'
+
+import { logout } from '../../services/authSlice'
+
+import styles from './header.module.scss'
+import fallbackimage from './Rectangle.svg'
 
 const Header = () => {
-  const { user, isLoggedIn } = useSelector((state) => state.auth);
-  const dispatch = useDispatch();
-  const history=useHistory();
+  const { user, isLoggedIn } = useSelector((state) => state.auth)
+  const dispatch = useDispatch()
+  const history = useHistory()
 
-  const handleLogout = async() => {
-    await dispatch(logout());
-    history.push('/');
-  };
-console.log(user);
+  const handleLogout = async () => {
+    await dispatch(logout())
+    history.push('/')
+  }
+
   return (
-    <header className="header">
-      <Link to="/" className="logo">Blog Platform</Link>
-      <div className="buttons">
+    <header className={styles.header}>
+      <Link to="/" className={styles.logo}>
+        Blog Platform
+      </Link>
+      <div className={styles.buttons}>
         {!isLoggedIn ? (
           <>
-            <Link to='/sign-in' className="signIn">Log In</Link>
-            <Link to='/sign-up' className="signUp">Sign Up</Link>
+            <Link to="/sign-in" className={styles.signIn}>
+              Log In
+            </Link>
+            <Link to="/sign-up" className={styles.signUp}>
+              Sign Up
+            </Link>
           </>
         ) : (
           <>
-          <Link to='/new-articles'>
-          <button className="create">Create article</button>
-          </Link>
-            
+            <Link to="/new-article">
+              <button className={styles.create}>Create article</button>
+            </Link>
+
             <Link to="/profile">
-              <button className="profile">
-                <span className="profile-name">{user?.username || 'User'}</span>
-                <img 
-                  className="profile-image" 
-                  src={user?.image || fallbackimage} 
-                  alt="Profile" 
-                />
+              <button className={styles.profile}>
+                <span className={styles.profileName}>{user?.username || 'User'}</span>
+                <img className={styles.profileImage} src={user?.image || fallbackimage} alt="Profile" />
               </button>
             </Link>
-            <button className="signUp logOut" onClick={handleLogout}>
+            <button className={`${styles.signUp} ${styles.logOut}`} onClick={handleLogout}>
               Log out
             </button>
           </>
         )}
       </div>
     </header>
-  );
-};
+  )
+}
 
-export default Header;
+export default Header

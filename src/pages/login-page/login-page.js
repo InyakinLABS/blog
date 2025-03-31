@@ -1,46 +1,45 @@
-import React, { useState } from "react";
-import { Link } from "react-router-dom";
-import { useForm } from "react-hook-form";
-import { useDispatch } from "react-redux";
-import { useLoginUserMutation } from "../../services/api";
-import styles from "./login-page.module.scss";
+import React, { useState } from 'react'
+import { Link } from 'react-router-dom'
+import { useForm } from 'react-hook-form'
+import { useDispatch } from 'react-redux'
+
+import { useLoginUserMutation } from '../../services/api'
 import { loginStart, loginSuccess, loginFailure } from '../../services/authSlice'
 
+import styles from './login-page.module.scss'
 
 const Login = () => {
-  const [serverError, setServerError] = useState(null);
-  const { 
-    register, 
-    handleSubmit, 
-    formState: { errors, isValid } 
-  } = useForm({ mode: 'onChange' });
-  const dispatch = useDispatch();
-  const [loginUser,{isLoading}] = useLoginUserMutation();
+  const [serverError, setServerError] = useState(null)
+  const {
+    register,
+    handleSubmit,
+    formState: { errors, isValid },
+  } = useForm({ mode: 'onChange' })
+  const dispatch = useDispatch()
+  const [loginUser, { isLoading }] = useLoginUserMutation()
 
   const onSubmit = async (data) => {
     try {
-      dispatch(loginStart());
+      dispatch(loginStart())
       const userData = await loginUser({
         email: data.email,
-        password: data.password
-      }).unwrap();
-      console.log(userData);
-      dispatch(loginSuccess(userData));
-      
+        password: data.password,
+      }).unwrap()
+      console.log(userData)
+      dispatch(loginSuccess(userData))
+      setServerError(null) // Добавлено использование setServerError
     } catch (error) {
-      dispatch(loginFailure(error.data?.message || 'Login failed'));
+      const errorMessage = error.data?.message || 'Login failed'
+      dispatch(loginFailure(errorMessage))
+      setServerError(errorMessage) // Используем setServerError
     }
-  };
+  }
 
   const renderServerError = () => {
-    if (!serverError) return null;
-    
-    return (
-      <div className={styles.errorMessage}>
-        {serverError}
-      </div>
-    );
-  };
+    if (!serverError) return null
+
+    return <div className={styles.errorMessage}>{serverError}</div>
+  }
 
   return (
     <div className={styles.regForm}>
@@ -52,18 +51,16 @@ const Login = () => {
           <input
             type="email"
             id="email"
-            {...register('email', { 
+            {...register('email', {
               required: 'Email is required',
               pattern: {
                 value: /^[^\s@]+@[^\s@]+\.[^\s@]+$/,
-                message: 'Invalid email address'
-              }
+                message: 'Invalid email address',
+              },
             })}
             className={`${styles.formInput} ${errors.email ? styles.errorInput : ''}`}
           />
-          {errors.email && (
-            <span className={styles.errorText}>{errors.email.message}</span>
-          )}
+          {errors.email && <span className={styles.errorText}>{errors.email.message}</span>}
         </div>
 
         <div className={styles.formGroup}>
@@ -71,30 +68,24 @@ const Login = () => {
           <input
             type="password"
             id="password"
-            {...register('password', { 
+            {...register('password', {
               required: 'Password is required',
               minLength: {
                 value: 6,
-                message: 'Password must be at least 6 characters'
-              }
+                message: 'Password must be at least 6 characters',
+              },
             })}
             className={`${styles.formInput} ${errors.password ? styles.errorInput : ''}`}
           />
-          {errors.password && (
-            <span className={styles.errorText}>{errors.password.message}</span>
-          )}
+          {errors.password && <span className={styles.errorText}>{errors.password.message}</span>}
         </div>
-        
+
         <div className={styles.formSubmit}>
-          <button 
-            type="submit" 
-            className={styles.submitBtn}
-            disabled={!isValid||isLoading }
-          >
-            {isValid&&isLoading? 'Logging in...' : 'Login'}
+          <button type="submit" className={styles.submitBtn} disabled={!isValid || isLoading}>
+            {isValid && isLoading ? 'Logging in...' : 'Login'}
           </button>
           <span className={styles.formSigninText}>
-            Don't have an account?{" "}
+            Don&apos;t have an account? {/* Исправлено на экранированный апостроф */}
             <Link className={styles.formLink} to="/sign-up">
               Sign Up
             </Link>
@@ -102,7 +93,7 @@ const Login = () => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default Login;
+export default Login

@@ -24,7 +24,7 @@
   &Title {
     font-size: 20px;
     line-height: 28px;
-    color: #1890FF;
+    color: #1890ff;
     display: -webkit-box;
     -webkit-line-clamp: 1;
     -webkit-box-orient: vertical;
@@ -53,13 +53,13 @@
     max-width: 100%;
     overflow-x: auto; // Горизонтальный скролл при переполнении
     padding-bottom: 2px; // Для скролла
-    
+
     &::-webkit-scrollbar {
       height: 3px;
     }
-    
+
     &::-webkit-scrollbar-thumb {
-      background: rgba(0,0,0,0.1);
+      background: rgba(0, 0, 0, 0.1);
       border-radius: 3px;
     }
   }
@@ -138,10 +138,16 @@
 }
 
 @keyframes fadeIn {
-  from { opacity: 0; transform: translateY(-20px); }
-  to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(-20px);
+  }
+  to {
+    opacity: 1;
+    transform: translateY(0);
+  }
 }
-.headerInfo{
+.headerInfo {
   display: flex;
   flex-direction: row;
   height: 28px;
@@ -154,5 +160,5 @@
   gap: 5px;
   flex-wrap: wrap;
   overflow: hidden;
- max-width: 700px;
+  max-width: 700px;
 }

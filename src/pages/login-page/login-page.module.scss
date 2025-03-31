@@ -1,94 +1,101 @@
 @keyframes fadeIn {
-    from { opacity: 0; transform: translateY(20px); }
-    to { opacity: 1; transform: translateY(0); }
+  from {
+    opacity: 0;
+    transform: translateY(20px);
   }
-  
-  .regForm {
-    height: fit-content;
-    width: 384px;
-    padding: 32px;
-    border: 1px solid #D9D9D9;
-    background-color: white;
-    border-radius: 5px;
-    margin: 60px auto 0;
-    display: flex;
-    flex-direction: column;
-    align-items: center;
-    box-shadow: 0px 22px 106px 0px rgba(0, 0, 0, 0.26);
-    animation: fadeIn 1s ease forwards;
+  to {
+    opacity: 1;
+    transform: translateY(0);
   }
-  
-  .formHeader {
-    margin-bottom: 20px;
-    font-size: 20px;
-    font-weight: 500;
-    line-height: 28px;
-    text-align: center;
+}
+
+.regForm {
+  height: fit-content;
+  width: 384px;
+  padding: 32px;
+  border: 1px solid #d9d9d9;
+  background-color: white;
+  border-radius: 5px;
+  margin: 60px auto 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  box-shadow: 0px 22px 106px 0px rgba(0, 0, 0, 0.26);
+  animation: fadeIn 1s ease forwards;
+}
+
+.formHeader {
+  margin-bottom: 20px;
+  font-size: 20px;
+  font-weight: 500;
+  line-height: 28px;
+  text-align: center;
+}
+
+.signupForm {
+  width: 100%;
+}
+
+.formGroup {
+  display: flex;
+  flex-direction: column;
+  margin-bottom: 12px;
+
+  label {
+    font-weight: 400;
+    font-size: 14px;
+    line-height: 22px;
+    color: #262626;
   }
-  
-  .signupForm {
-    width: 100%;
+}
+
+.formInput {
+  height: 40px;
+  width: 100%;
+  border: 1px solid #d9d9d9;
+  border-radius: 5px;
+  padding: 10px;
+  color: #595959;
+
+  &::placeholder {
+    color: #d9d9d9;
   }
-  
-  .formGroup {
-    display: flex;
-    flex-direction: column;
-    margin-bottom: 12px;
-  
-    label {
-      font-weight: 400;
-      font-size: 14px;
-      line-height: 22px;
-      color: #262626;
-    }
+}
+
+.formSubmit {
+  display: flex;
+  flex-direction: column;
+  gap: 8px;
+  margin-top: 20px;
+}
+
+.submitBtn {
+  width: 100%;
+  height: 40px;
+  background-color: #1890ff;
+  color: white;
+  border-radius: 5px;
+  border: none;
+  cursor: pointer;
+
+  &:hover {
+    background-color: darken(#1890ff, 5%);
   }
-  
-  .formInput {
-    height: 40px;
-    width: 100%;
-    border: 1px solid #D9D9D9;
-    border-radius: 5px;
-    padding: 10px;
-    color: #595959;
-  
-    &::placeholder {
-      color: #D9D9D9;
-    }
+}
+
+.formSigninText {
+  font-size: 12px;
+  line-height: 20px;
+  text-align: center;
+  color: #8c8c8c;
+  margin-left: 5px;
+}
+
+.formLink {
+  color: #1890ff;
+  text-decoration: none;
+
+  &:hover {
+    text-decoration: underline;
   }
-  
-  .formSubmit {
-    display: flex;
-    flex-direction: column;
-    gap: 8px;
-    margin-top: 20px;
-  }
-  
-  .submitBtn {
-    width: 100%;
-    height: 40px;
-    background-color: #1890FF;
-    color: white;
-    border-radius: 5px;
-    border: none;
-    cursor: pointer;
-  
-    &:hover {
-      background-color: darken(#1890FF, 5%);
-    }
-  }
-  
-  .formSigninText {
-    font-size: 12px;
-    line-height: 20px;
-    text-align: center;
-    color: #8C8C8C;
-  }
-  
-  .formLink {
-    color: #1890FF;
-    text-decoration: none;
-  
-    &:hover {
-      text-decoration: underline;
-    }
-  }
+}

@@ -1,52 +1,55 @@
-import React  from "react";
-import Post from "../Post/Post";
-import './post-list.scss';
-import { Pagination ,Spin,Flex} from 'antd';
-import { LoadingOutlined } from '@ant-design/icons';
-import { useGetArticlesQuery } from "../../services/api";
-import { useState,useEffect } from "react";
-import { store } from "../../services/store";
+import React, { useState, useEffect } from 'react'
+import { Pagination, Spin, Flex } from 'antd'
+import { LoadingOutlined } from '@ant-design/icons'
+
+import { useGetArticlesQuery } from '../../services/api'
+import { store } from '../../services/store'
+import Post from '../Post/Post'
+
+import styles from './post-list.module.scss'
 
 const PostList = () => {
+  const [currentPage, setCurrentPage] = useState(1)
+  const pageSize = 5
 
-  
-    const [currentPage, setCurrentPage] = useState(1);
-    const pageSize = 5;
- 
-    const queryArgs = React.useMemo(() => ({
-        limit: pageSize,
-        offset: (currentPage - 1) * pageSize
-      }), [currentPage, pageSize]);
-    
-      const { data, isLoading, isError,error,refetch} = useGetArticlesQuery(queryArgs);
-  const {isLoggedIn} =store.getState().auth;
+  const queryArgs = React.useMemo(
+    () => ({
+      limit: pageSize,
+      offset: (currentPage - 1) * pageSize,
+    }),
+    [currentPage, pageSize]
+  )
+
+  const { data, isLoading, isError, error, refetch } = useGetArticlesQuery(queryArgs)
+  const { isLoggedIn } = store.getState().auth
   useEffect(() => {
-    if (!isLoggedIn) refetch();
-  }, [isLoggedIn, refetch]);
-  const articles = data?.articles || [];
-  const articlesCount = data?.articlesCount || 0;
-console.log(data);
-  if (isLoading) return(
-  <Flex align="center" gap="middle" className="spinner">
-  <Spin indicator={<LoadingOutlined style={{ fontSize: 52 }} spin />} />
-</Flex>);
-  if (isError) return <div>Error: {error.message}</div>;
-  if (!articles.length) return <div>No articles found</div>;
-const handleClick=(page)=>{
-    setCurrentPage(page);
-}
+    if (!isLoggedIn) refetch()
+  }, [isLoggedIn, refetch])
+  const articles = data?.articles || []
+  const articlesCount = data?.articlesCount || 0
+
+  if (isLoading)
+    return (
+      <Flex align="center" gap="middle" className={styles.spinner}>
+        <Spin indicator={<LoadingOutlined style={{ fontSize: 52 }} spin />} />
+      </Flex>
+    )
+  if (isError) return <div>Error: {error.message}</div>
+  if (!articles.length) return <div>No articles found</div>
+
+  const handleClick = (page) => {
+    setCurrentPage(page)
+  }
+
   return (
-    <div className="container">
-      <ul className="post-list">
-        {articles.map(article => (
-          <Post 
-            key={article.slug + article.createdAt} 
-            article={article} 
-          />
+    <div className={styles.container}>
+      <ul className={styles.postList}>
+        {articles.map((article) => (
+          <Post key={article.slug + article.createdAt} article={article} />
         ))}
       </ul>
-      <Pagination 
-        className="custom-pagination" 
+      <Pagination
+        className={styles.customPagination}
         defaultCurrent={1}
         total={articlesCount}
         pageSize={5}
@@ -54,7 +57,7 @@ const handleClick=(page)=>{
         onChange={handleClick}
       />
     </div>
-  );
-};
+  )
+}
 
-export default PostList;
+export default PostList

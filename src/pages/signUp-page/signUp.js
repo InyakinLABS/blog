@@ -1,44 +1,46 @@
-import React, { useState } from 'react';
-import { useForm } from 'react-hook-form';
-import { Link } from 'react-router-dom';
-import { useRegisterUserMutation } from '../../services/api';
-import styles from './signUp.module.scss';
-import { Result, Button } from 'antd';
+import React, { useState } from 'react'
+import { useForm } from 'react-hook-form'
+import { Link } from 'react-router-dom'
+import { Result, Button } from 'antd'
+
+import { useRegisterUserMutation } from '../../services/api'
+
+import styles from './signUp.module.scss'
 
 const SignUp = () => {
-  const [showResult, setShowResult] = useState(null); // null | 'success' | 'error'
-  const [errorMessage, setErrorMessage] = useState('');
-  
+  const [showResult, setShowResult] = useState(null) // null | 'success' | 'error'
+  const [errorMessage, setErrorMessage] = useState('')
+
   const {
     register,
     handleSubmit,
     formState: { errors, isValid, isSubmitting },
     reset,
-    watch
+    watch,
   } = useForm({
-    mode: 'onChange'
-  });
+    mode: 'onChange',
+  })
 
-  const [registerUser, { isLoading }] = useRegisterUserMutation();
+  const [registerUser, { isLoading }] = useRegisterUserMutation()
 
   const onSubmit = async (formData) => {
     try {
       await registerUser({
         username: formData.username,
         email: formData.email,
-        password: formData.password
-      }).unwrap();
-      
-      setShowResult('success');
-      reset();
+        password: formData.password,
+      }).unwrap()
+
+      setShowResult('success')
+      reset()
     } catch (error) {
-      setErrorMessage(error.data?.message || 'Registration failed');
-      setShowResult('error');
+      setErrorMessage(error.data?.message || 'Registration failed')
+      setShowResult('error')
     }
-  };
+  }
 
   // Регулярное выражение для email с обязательной точкой
-  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+  const emailRegex = /^[^\s@]+@[^\s@]+\.[^\s@]+$/
 
   if (showResult === 'success') {
     return (
@@ -50,11 +52,11 @@ const SignUp = () => {
           extra={[
             <Button type="primary" key="signin">
               <Link to="/signIn">Sign In</Link>
-            </Button>
+            </Button>,
           ]}
         />
       </div>
-    );
+    )
   }
 
   if (showResult === 'error') {
@@ -67,18 +69,17 @@ const SignUp = () => {
           extra={[
             <Button type="primary" key="tryAgain" onClick={() => setShowResult(null)}>
               Try Again
-            </Button>
+            </Button>,
           ]}
         />
       </div>
-    );
+    )
   }
 
   return (
     <div className={styles.regForm}>
       <p className={styles.formHeader}>Create new account</p>
       <form className={styles.signupForm} onSubmit={handleSubmit(onSubmit)}>
-        
         {/* Username */}
         <div className={styles.formGroup}>
           <label htmlFor="username">Username</label>
@@ -86,12 +87,12 @@ const SignUp = () => {
             id="username"
             placeholder="Username"
             className={`${styles.formInput} ${errors.username && styles.errorInput}`}
-            {...register('username', { 
+            {...register('username', {
               required: 'Username is required',
-              minLength: { 
-                value: 3, 
-                message: 'Username must be at least 3 characters' 
-              }
+              minLength: {
+                value: 3,
+                message: 'Username must be at least 3 characters',
+              },
             })}
           />
           {errors.username && <span className={styles.errorText}>{errors.username.message}</span>}
@@ -105,12 +106,12 @@ const SignUp = () => {
             type="email"
             placeholder="Email"
             className={`${styles.formInput} ${errors.email && styles.errorInput}`}
-            {...register('email', { 
+            {...register('email', {
               required: 'Email is required',
-              pattern: { 
+              pattern: {
                 value: emailRegex,
-                message: 'Please enter a valid email (example@domain.com)' 
-              }
+                message: 'Please enter a valid email (example@domain.com)',
+              },
             })}
           />
           {errors.email && <span className={styles.errorText}>{errors.email.message}</span>}
@@ -124,12 +125,12 @@ const SignUp = () => {
             type="password"
             placeholder="Password"
             className={`${styles.formInput} ${errors.password && styles.errorInput}`}
-            {...register('password', { 
+            {...register('password', {
               required: 'Password is required',
-              minLength: { 
-                value: 6, 
-                message: 'Password must be at least 6 characters' 
-              }
+              minLength: {
+                value: 6,
+                message: 'Password must be at least 6 characters',
+              },
             })}
           />
           {errors.password && <span className={styles.errorText}>{errors.password.message}</span>}
@@ -143,10 +144,9 @@ const SignUp = () => {
             type="password"
             placeholder="Repeat Password"
             className={`${styles.formInput} ${errors.repeatPassword && styles.errorInput}`}
-            {...register('repeatPassword', { 
+            {...register('repeatPassword', {
               required: 'Please repeat your password',
-              validate: value => 
-                value === watch('password') || 'Passwords do not match'
+              validate: (value) => value === watch('password') || 'Passwords do not match',
             })}
           />
           {errors.repeatPassword && <span className={styles.errorText}>{errors.repeatPassword.message}</span>}
@@ -158,8 +158,8 @@ const SignUp = () => {
             id="agree"
             type="checkbox"
             className={`${styles.checkboxInput} ${errors.agree && styles.errorCheckbox}`}
-            {...register('agree', { 
-              required: 'You must agree to the terms' 
+            {...register('agree', {
+              required: 'You must agree to the terms',
             })}
           />
           <label htmlFor="agree" className={styles.checkboxLabel}>
@@ -170,12 +170,8 @@ const SignUp = () => {
 
         {/* Submit Button */}
         <div className={styles.formSubmit}>
-          <button
-            type="submit"
-            className={styles.submitBtn}
-            disabled={!isValid || isSubmitting || isLoading}
-          >
-            {(isSubmitting || isLoading) ? 'Processing...' : 'Create'}
+          <button type="submit" className={styles.submitBtn} disabled={!isValid || isSubmitting || isLoading}>
+            {isSubmitting || isLoading ? 'Processing...' : 'Create'}
           </button>
           <span className={styles.formSigninText}>
             Already have an account?{' '}
@@ -186,7 +182,7 @@ const SignUp = () => {
         </div>
       </form>
     </div>
-  );
-};
+  )
+}
 
-export default SignUp;
+export default SignUp
