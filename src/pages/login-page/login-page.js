@@ -9,43 +9,57 @@ import { loginStart, loginSuccess, loginFailure } from '../../services/authSlice
 import styles from './login-page.module.scss'
 
 const Login = () => {
-  const [serverError, setServerError] = useState(null)
+  const [formError, setFormError] = useState(null)
   const {
     register,
     handleSubmit,
-    formState: { errors, isValid },
-  } = useForm({ mode: 'onChange' })
+    formState: { errors, isSubmitting },
+    setError,
+    clearErrors,
+  } = useForm({
+    mode: 'onTouched',
+  })
+
   const dispatch = useDispatch()
   const [loginUser, { isLoading }] = useLoginUserMutation()
 
   const onSubmit = async (data) => {
     try {
       dispatch(loginStart())
+      clearErrors()
+      setFormError(null)
+
       const userData = await loginUser({
         email: data.email,
         password: data.password,
       }).unwrap()
-      console.log(userData)
+
       dispatch(loginSuccess(userData))
-      setServerError(null) // Добавлено использование setServerError
     } catch (error) {
-      const errorMessage = error.data?.message || 'Login failed'
-      dispatch(loginFailure(errorMessage))
-      setServerError(errorMessage) // Используем setServerError
+      console.log(formError)
+      // Обработка ошибки в формате {"errors":{"email or password":"is invalid"}}
+      if (error && error['email or password']) {
+        const errorMessage = 'Email or password is invalid'
+        setFormError(errorMessage)
+        setError('email', { type: 'server', message: errorMessage })
+        setError('password', { type: 'server', message: errorMessage })
+      } else {
+        const errorMessage = error.message || 'Something went wrong'
+        setFormError(errorMessage)
+      }
+
+      dispatch(loginFailure(error?.message || 'Login failed'))
     }
-  }
-
-  const renderServerError = () => {
-    if (!serverError) return null
-
-    return <div className={styles.errorMessage}>{serverError}</div>
   }
 
   return (
     <div className={styles.regForm}>
       <p className={styles.formHeader}>Sign In</p>
-      {renderServerError()}
+
+      {/* Общая ошибка формы */}
+      <span className={styles.formError}>{formError}</span>
       <form className={styles.signupForm} onSubmit={handleSubmit(onSubmit)}>
+        {/* Email Field */}
         <div className={styles.formGroup}>
           <label htmlFor="email">Email address</label>
           <input
@@ -59,10 +73,11 @@ const Login = () => {
               },
             })}
             className={`${styles.formInput} ${errors.email ? styles.errorInput : ''}`}
+            onChange={() => clearErrors('email')}
           />
-          {errors.email && <span className={styles.errorText}>{errors.email.message}</span>}
         </div>
 
+        {/* Password Field */}
         <div className={styles.formGroup}>
           <label htmlFor="password">Password</label>
           <input
@@ -76,16 +91,17 @@ const Login = () => {
               },
             })}
             className={`${styles.formInput} ${errors.password ? styles.errorInput : ''}`}
+            onChange={() => clearErrors('password')}
           />
-          {errors.password && <span className={styles.errorText}>{errors.password.message}</span>}
         </div>
 
+        {/* Submit Button */}
         <div className={styles.formSubmit}>
-          <button type="submit" className={styles.submitBtn} disabled={!isValid || isLoading}>
-            {isValid && isLoading ? 'Logging in...' : 'Login'}
+          <button type="submit" className={styles.submitBtn} disabled={isSubmitting || isLoading}>
+            {isSubmitting || isLoading ? 'Logging in...' : 'Login'}
           </button>
           <span className={styles.formSigninText}>
-            Don&apos;t have an account? {/* Исправлено на экранированный апостроф */}
+            Don&apos;t have an account?{' '}
             <Link className={styles.formLink} to="/sign-up">
               Sign Up
             </Link>

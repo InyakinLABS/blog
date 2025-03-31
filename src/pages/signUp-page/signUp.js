@@ -22,7 +22,7 @@ const SignUp = () => {
     clearErrors,
     trigger,
   } = useForm({
-    mode: 'onTouched',
+    mode: 'onChange',
     defaultValues: {
       username: '',
       email: '',
