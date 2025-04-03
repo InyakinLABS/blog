@@ -41,10 +41,11 @@ const EditPost = () => {
   }
 
   const removeTag = (index) => {
-    if (tags.length > 1) {
-      const newTags = [...tags]
-      newTags.splice(index, 1)
-      setTags(newTags)
+    const newTags = [...tags]
+    newTags.splice(index, 1)
+    setTags(newTags)
+    if (newTags.length === 0) {
+      setTags([''])
     }
   }
 
@@ -52,6 +53,9 @@ const EditPost = () => {
     const newTags = [...tags]
     newTags[index] = value
     setTags(newTags)
+  }
+  const validateNotEmpty = (value) => {
+    return value.trim() !== '' || 'Field cannot be empty or contain only spaces'
   }
 
   const onSubmit = async (data) => {
@@ -74,7 +78,6 @@ const EditPost = () => {
   }
 
   if (isLoading) return <div className={styles.loading}>Loading...</div>
-
   return (
     <div className={styles.newPost}>
       <span className={styles.newPostTitle}>Edit article</span>
@@ -86,7 +89,10 @@ const EditPost = () => {
             id="title"
             placeholder="Title"
             className={styles.titleInput}
-            {...register('title', { required: 'Title is required' })}
+            {...register('title', {
+              required: 'Title is required',
+              validate: validateNotEmpty,
+            })}
           />
           {errors.title && <span className={styles.errorMessage}>{errors.title.message}</span>}
         </div>
@@ -98,7 +104,10 @@ const EditPost = () => {
             id="description"
             placeholder="Description"
             className={styles.titleInput}
-            {...register('description', { required: 'Description is required' })}
+            {...register('description', {
+              required: 'Description is required',
+              validate: validateNotEmpty,
+            })}
           />
           {errors.description && <span className={styles.errorMessage}>{errors.description.message}</span>}
         </div>
@@ -109,50 +118,46 @@ const EditPost = () => {
             id="body"
             placeholder="Text"
             className={styles.postBodyInput}
-            {...register('body', { required: 'Text is required' })}
+            {...register('body', {
+              required: 'Text is required',
+              validate: validateNotEmpty,
+            })}
           />
           {errors.body && <span className={styles.errorMessage}>{errors.body.message}</span>}
         </div>
 
         <div className={`${styles.formGroup} ${styles.tags}`}>
-          <label>Tags</label>
+          <label htmlFor="tag">Tags</label>
           {tags.map((tag, index) => (
-            <div className={styles.tagRow} key={index}>
+            <div className={styles.addTag} key={index}>
               <input
+                id="tag"
                 type="text"
                 placeholder="Tag"
                 value={tag}
                 onChange={(e) => handleTagChange(index, e.target.value)}
-                className={styles.tagInput}
               />
-              <div className={styles.tagButtons}>
-                {index === tags.length - 1 ? (
-                  <>
-                    <button type="button" className="tag-btn" onClick={() => removeTag(index)}>
-                      Delete
-                    </button>
-                    {
-                      <button type="button" className="tag-btn add-tag" onClick={addTag}>
-                        Add tag
-                      </button>
-                    }
-                  </>
-                ) : (
-                  <button type="button" className="tag-btn" onClick={() => removeTag(index)}>
-                    Delete
+
+              <>
+                <button type="button" className={styles.tagBtn} onClick={() => removeTag(index)}>
+                  Delete
+                </button>
+                {index === tags.length - 1 && (
+                  <button type="button" className={`${styles.tagBtn} ${styles.addTagBtn}`} onClick={addTag}>
+                    Add tag
                   </button>
                 )}
-              </div>
+              </>
             </div>
           ))}
+          {errors.tags && <span className={styles.errorMessage}>{errors.tags.message}</span>}
 
-          <button type="submit" className={styles.sendPost} disabled={Object.keys(errors).length > 0}>
-            Update Article
+          <button type="submit" className={styles.sendPost}>
+            Send
           </button>
         </div>
       </form>
     </div>
   )
 }
-
 export default EditPost

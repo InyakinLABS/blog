@@ -9,23 +9,31 @@ import Profile from '../../pages/profile-page/profile'
 import PostList from '../Post-list/Post-list'
 import { checkAuth } from '../../services/authSlice'
 import './app.scss'
-import { store } from '../../services/store'
 import NewPost from '../../pages/createPost-page/create-post'
 import PostPage from '../../pages/post-page/post-page'
 import EditPost from '../../pages/edit-post/edit-post'
 
 const App = () => {
   const dispatch = useDispatch()
-  const isLoggedIn = useSelector((state) => state.auth.isLoggedIn)
+  const { isLoggedIn, authChecked } = useSelector((state) => state.auth)
 
   useEffect(() => {
     dispatch(checkAuth())
-    console.log(store.getState())
   }, [dispatch])
 
-  const renderProtected = (Component) => () => (isLoggedIn ? <Component /> : <Redirect to="/sign-in" />)
+  const renderProtected = (Component) => () => {
+    if (!authChecked) return null // Показываем null пока проверка не завершена
+    return isLoggedIn ? <Component /> : <Redirect to="/sign-in" />
+  }
 
-  const renderGuest = (Component) => () => (isLoggedIn ? <Redirect to="/" /> : <Component />)
+  const renderGuest = (Component) => () => {
+    if (!authChecked) return null // Показываем null пока проверка не завершена
+    return isLoggedIn ? <Redirect to="/" /> : <Component />
+  }
+
+  if (!authChecked) {
+    return <div>Loading...</div> // или ваш лоадер
+  }
 
   return (
     <div>
@@ -39,11 +47,9 @@ const App = () => {
         <Route path="/profile" render={renderProtected(Profile)} />
         <Route path="/sign-in" render={renderGuest(Login)} />
         <Route path="/sign-up" render={renderGuest(SignUp)} />
-
         <Redirect to="/" />
       </Switch>
     </div>
   )
 }
-
 export default App

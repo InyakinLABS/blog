@@ -13,35 +13,54 @@ const NewPost = () => {
     register,
     handleSubmit,
     formState: { errors },
+    setError,
+    clearErrors,
   } = useForm()
   const [createPost] = useCreatePostMutation()
   const history = useHistory()
 
   const addTag = () => {
+    if (tags[tags.length - 1].trim() === '') {
+      setError('tags', { type: 'manual', message: 'Fill this field before adding a new one' })
+      return
+    }
+    clearErrors('tags')
     setTags([...tags, ''])
   }
 
   const removeTag = (index) => {
-    if (tags.length > 1) {
-      const newTags = [...tags]
-      newTags.splice(index, 1)
-      setTags(newTags)
+    const newTags = [...tags]
+    newTags.splice(index, 1)
+    setTags(newTags)
+    if (newTags.length === 0) {
+      setTags([''])
     }
+    clearErrors('tags')
   }
 
   const handleTagChange = (index, value) => {
     const newTags = [...tags]
     newTags[index] = value
     setTags(newTags)
+    clearErrors('tags')
+  }
+
+  const validateNotEmpty = (value) => {
+    return value.trim() !== '' || 'Field cannot be empty or contain only spaces'
   }
 
   const onSubmit = async (data) => {
     const formData = {
       ...data,
-      tagList: tags.filter((tag) => tag.trim() !== ''),
+      tagList: tags.map((tag) => tag.trim()).filter((tag) => tag !== ''),
     }
-    await createPost(formData)
-    history.push('/articles')
+
+    try {
+      await createPost(formData)
+      history.push('/articles')
+    } catch (error) {
+      console.error('Failed to create post:', error)
+    }
   }
 
   return (
@@ -55,7 +74,10 @@ const NewPost = () => {
             id="title"
             placeholder="Title"
             className={styles.titleInput}
-            {...register('title', { required: 'Title is required' })}
+            {...register('title', {
+              required: 'Title is required',
+              validate: validateNotEmpty,
+            })}
           />
           {errors.title && <span className={styles.errorMessage}>{errors.title.message}</span>}
         </div>
@@ -67,7 +89,10 @@ const NewPost = () => {
             id="description"
             placeholder="Description"
             className={styles.titleInput}
-            {...register('description', { required: 'Description is required' })}
+            {...register('description', {
+              required: 'Description is required',
+              validate: validateNotEmpty,
+            })}
           />
           {errors.description && <span className={styles.errorMessage}>{errors.description.message}</span>}
         </div>
@@ -78,13 +103,16 @@ const NewPost = () => {
             id="body"
             placeholder="Text"
             className={styles.postBodyInput}
-            {...register('body', { required: 'Text is required' })}
+            {...register('body', {
+              required: 'Text is required',
+              validate: validateNotEmpty,
+            })}
           />
           {errors.body && <span className={styles.errorMessage}>{errors.body.message}</span>}
         </div>
 
         <div className={`${styles.formGroup} ${styles.tags}`}>
-          <label htmlFor="tag">Tags </label>
+          <label htmlFor="tag">Tags</label>
           {tags.map((tag, index) => (
             <div className={styles.addTag} key={index}>
               <input
@@ -93,22 +121,20 @@ const NewPost = () => {
                 value={tag}
                 onChange={(e) => handleTagChange(index, e.target.value)}
               />
-              {index === tags.length - 1 ? (
-                <>
-                  <button type="button" className={styles.tagBtn} onClick={() => removeTag(index)}>
-                    Delete
-                  </button>
-                  <button type="button" className={`${styles.tagBtn} ${styles.addTagBtn}`} onClick={addTag}>
-                    Add tag
-                  </button>
-                </>
-              ) : (
+
+              <>
                 <button type="button" className={styles.tagBtn} onClick={() => removeTag(index)}>
                   Delete
                 </button>
-              )}
+                {index === tags.length - 1 && (
+                  <button type="button" className={`${styles.tagBtn} ${styles.addTagBtn}`} onClick={addTag}>
+                    Add tag
+                  </button>
+                )}
+              </>
             </div>
           ))}
+          {errors.tags && <span className={styles.errorMessage}>{errors.tags.message}</span>}
 
           <button type="submit" className={styles.sendPost}>
             Send
@@ -118,5 +144,4 @@ const NewPost = () => {
     </div>
   )
 }
-
 export default NewPost
