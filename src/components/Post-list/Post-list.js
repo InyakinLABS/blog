@@ -15,11 +15,9 @@ const PostList = () => {
   const { search, pathname } = useLocation()
   const history = useHistory()
 
-  // Получаем страницу из URL параметров
   const page = new URLSearchParams(search).get('page') || '1'
   const currentPage = Math.max(1, parseInt(page, 10)) || 1
 
-  // Формируем запрос с пагинацией
   const { data, isLoading, isError, error, refetch } = useGetArticlesQuery({
     limit: PAGE_SIZE,
     offset: (currentPage - 1) * PAGE_SIZE,

@@ -22,17 +22,13 @@ const App = () => {
   }, [dispatch])
 
   const renderProtected = (Component) => () => {
-    if (!authChecked) return null // Показываем null пока проверка не завершена
+    if (!authChecked) return null
     return isLoggedIn ? <Component /> : <Redirect to="/sign-in" />
   }
 
   const renderGuest = (Component) => () => {
-    if (!authChecked) return null // Показываем null пока проверка не завершена
+    if (!authChecked) return null
     return isLoggedIn ? <Redirect to="/" /> : <Component />
-  }
-
-  if (!authChecked) {
-    return <div>Loading...</div> // или ваш лоадер
   }
 
   return (
