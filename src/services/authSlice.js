@@ -1,4 +1,3 @@
-// features/auth/authSlice.js
 import { createSlice } from '@reduxjs/toolkit'
 
 import { api } from './api'
@@ -7,7 +6,7 @@ const initialState = {
   isLoggedIn: false,
   loading: false,
   error: null,
-  authChecked: false, // Добавляем флаг проверки аутентификации
+  authChecked: false,
 }
 
 const authSlice = createSlice({
@@ -23,18 +22,18 @@ const authSlice = createSlice({
       state.user = action.payload
       state.isLoggedIn = true
       state.loading = false
-      state.authChecked = true // Устанавливаем флаг при успешном логине
+      state.authChecked = true
     },
     loginFailure(state, action) {
       state.error = action.payload
       state.loading = false
-      state.authChecked = true // Устанавливаем флаг даже при ошибке
+      state.authChecked = true
     },
     logout(state) {
       state.token = null
       state.user = null
       state.isLoggedIn = false
-      state.authChecked = true // Устанавливаем флаг при выходе
+      state.authChecked = true
       localStorage.removeItem('token')
       localStorage.removeItem('user')
       api.util.invalidateTags(['Article'])
@@ -48,7 +47,7 @@ const authSlice = createSlice({
         state.isLoggedIn = true
         state.user = JSON.parse(user)
       }
-      state.authChecked = true // Устанавливаем флаг после проверки
+      state.authChecked = true
     },
     updateUser(state) {
       const user = JSON.parse(localStorage.getItem('user'))
